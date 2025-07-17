@@ -28,6 +28,9 @@ SOLUTION: O(N) space
 class Solution {
 public:
     bool isPalindrome(string s) {
+        // Edge case
+        if(s.empty())
+            return true;
         //removing all the non-alphanumeric characters and converting
         // uppercase to lowercase
         string result = "";
