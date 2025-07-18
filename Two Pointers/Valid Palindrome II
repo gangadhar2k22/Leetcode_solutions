@@ -1,0 +1,60 @@
+QUESTION:
+
+Given a string s, return true if the s can be palindrome after deleting at most one character from it.
+Example 1:
+Input: s = "aba"
+Output: true
+Example 2:
+Input: s = "abca"
+Output: true
+Explanation: You could delete the character 'c'.
+Example 3:
+Input: s = "abc"
+Output: false
+ 
+Constraints:
+1 <= s.length <= 105
+s consists of lowercase English letters.
+
+CODE:
+
+class Solution {
+public:
+    bool isPalindrome(int i,int j,string str){
+        while(i<=j){
+            if(str[i]!=str[j]){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+    bool validPalindrome(string s) {
+        //edge cases
+        if(s.empty())
+            return true;
+        if(s.length()==1)
+            return true;
+        // Two Pointer approach
+        int left=0,right=s.length()-1;
+        while(left<=right){
+            //at any point if they are not equal,
+            if(s[left]!=s[right]){
+                //exclude right and check remaining char forms palindrome
+                if(isPalindrome(left,right-1,s))
+                    return true;
+                //exclude left and check remaining char forms palindrome
+                else if(isPalindrome(left+1,right,s))
+                    return true;
+                else
+                    return false;
+            }
+            else{
+                left++;
+                right--;
+            }
+        }
+        return true;
+    }
+};
