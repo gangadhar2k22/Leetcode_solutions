@@ -1,0 +1,93 @@
+QUESTION:
+
+There are several cards arranged in a row, and each card has an associated number of points. The points are given in the integer array cardPoints.
+In one step, you can take one card from the beginning or from the end of the row. You have to take exactly k cards.
+Your score is the sum of the points of the cards you have taken.
+Given the integer array cardPoints and the integer k, return the maximum score you can obtain.
+
+Example 1:
+Input: cardPoints = [1,2,3,4,5,6,1], k = 3
+Output: 12
+Explanation: After the first step, your score will always be 1. However, choosing the rightmost card first will maximize your total score. The optimal strategy is to take the three cards on the right, giving a final score of 1 + 6 + 5 = 12.
+
+Example 2:
+Input: cardPoints = [2,2,2], k = 2
+Output: 4
+Explanation: Regardless of which two cards you take, your score will always be 4.
+
+Example 3:
+Input: cardPoints = [9,7,7,9,7,7,9], k = 7
+Output: 55
+Explanation: You have to take all the cards. Your score is the sum of points of all cards.
+ 
+Constraints:
+1 <= cardPoints.length <= 105
+1 <= cardPoints[i] <= 104
+1 <= k <= cardPoints.length
+
+CODE:
+Method-1: Sliding Window with Wrapping (Circular View)
+class Solution {
+public:
+    int maxScore(vector<int>& cardScore, int k) {
+        int n = cardScore.size();
+        int i = n - k;  // Start pointer from the position where the last k cards begin
+        int j = i;      // End pointer for window traversal
+        int sum = 0;    // Current window sum
+        int maxi = INT_MIN;
+        int count = 0;
+
+        // Step 1: Calculate initial sum of last k elements (using circular access)
+        while (count < k) {
+            sum += cardScore[j];
+            count++;
+            j = (j + 1) % n;  // Wrap around if needed
+        }
+
+        maxi = max(maxi, sum);
+
+        // Step 2: Slide the window one card at a time from end toward the front
+        while (j < k) {
+            sum += cardScore[j];
+            sum -= cardScore[i];
+            maxi = max(maxi, sum);
+            i++;
+            j++;
+        }
+
+        return maxi;
+    }
+};
+
+Method-2: Front + Back Combination (Clean & Efficient)
+
+class Solution {
+public:
+    int maxScore(vector<int>& cardScore, int k) {
+        int n = cardScore.size();
+        int maxi = INT_MIN;
+        int leftSum = 0, rightSum = 0;
+
+        // Step 1: Take the first k cards from the front
+        for (int i = 0; i < k; i++)
+            leftSum += cardScore[i];
+
+        // Initialize maximum with the initial front sum
+        maxi = leftSum;
+
+        int end = n - 1;
+
+        // Step 2: Slide one card at a time from front to back
+        // Take i cards from front, and k - i cards from back
+        for (int i = k - 1; i >= 0; i--) {
+            leftSum -= cardScore[i];        // Remove one from front
+            rightSum += cardScore[end];     // Add one from back
+            end--;
+            maxi = max(maxi, leftSum + rightSum);
+        }
+
+        return maxi;
+    }
+};
+
+
