@@ -1,0 +1,91 @@
+QUESTION:
+
+You are visiting a farm that has a single row of fruit trees arranged from left to right. The trees are represented by an integer array 
+fruits where fruits[i] is the type of fruit the ith tree produces.You want to collect as much fruit as possible. However, the owner has 
+some strict rules that you must follow:
+You only have two baskets, and each basket can only hold a single type of fruit. There is no limit on the amount of fruit each basket can hold.
+Starting from any tree of your choice, you must pick exactly one fruit from every tree (including the start tree) while moving to the right. 
+The picked fruits must fit in one of your baskets.Once you reach a tree with fruit that cannot fit in your baskets, you must stop.
+Given the integer array fruits, return the maximum number of fruits you can pick.
+
+Example 1:
+Input: fruits = [1,2,1]
+Output: 3
+Explanation: We can pick from all 3 trees.
+
+Example 2:
+Input: fruits = [0,1,2,2]
+Output: 3
+Explanation: We can pick from trees [1,2,2].
+If we had started at the first tree, we would only pick from trees [0,1].
+
+Example 3:
+Input: fruits = [1,2,3,2,2]
+Output: 4
+Explanation: We can pick from trees [2,3,2,2].
+If we had started at the first tree, we would only pick from trees [1,2].
+
+Constraints:
+1 <= fruits.length <= 105
+0 <= fruits[i] < fruits.length
+
+CODE:
+
+int totalFruit(vector<int>& fruits) {
+        //Brute force- Generate all sub arrays that contains atmost 2 fruits types
+        int n = fruits.size();
+        int max_fruits=0;
+        for(int i=0;i<n;i++){
+            unordered_map<int,int>basket;
+            for(int j=i;j<n;j++){
+                basket[fruits[j]]++;
+                if(basket.size()>2)
+                    break;
+                   max_fruits = max(max_fruits,j-i+1);
+            }
+        }
+        return max_count;
+    }
+
+OPTIMIZED SLIDING WINDOW APPROACH:
+
+class Solution {
+public:
+    int totalFruit(vector<int>& fruits) {
+        int n = fruits.size();
+
+        // Initialize sliding window pointers
+        int i = 0, j = 0;
+
+        // Map to store the count of each fruit type in the current window
+        unordered_map<int, int> basket;
+
+        // Variable to store the maximum number of fruits picked
+        int max_fruits = 0;
+
+        // Traverse the fruits array using right pointer 'j'
+        while (j < n) {
+            // Include the current fruit in the basket
+            basket[fruits[j]]++;
+
+            // If we have 2 or fewer fruit types, update the result
+            if (basket.size() <= 2) {
+                max_fruits = max(max_fruits, j - i + 1);
+            } 
+            else {
+                // If we have more than 2 types, shrink window from the left
+                basket[fruits[i]]--;
+
+                // Remove the fruit type completely if its count becomes zero
+                if (basket[fruits[i]] == 0) {
+                    basket.erase(fruits[i]);
+                }
+                i++; // Move left pointer forward
+            }
+
+            j++; // Expand the window from the right
+        }
+
+        return max_fruits;
+    }
+};
