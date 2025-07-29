@@ -1,0 +1,108 @@
+QUESTION:
+
+You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character.
+You can perform this operation at most k times.
+Return the length of the longest substring containing the same letter you can get after performing the above operations.
+
+Example 1:
+Input: s = "ABAB", k = 2
+Output: 4
+Explanation: Replace the two 'A's with two 'B's or vice versa.
+
+Example 2:
+Input: s = "AABABBA", k = 1
+Output: 4
+Explanation: Replace the one 'A' in the middle with 'B' and form "AABBBBA".
+The substring "BBBB" has the longest repeating letters, which is 4.
+There may exists other ways to achieve this answer too.
+ 
+Constraints:
+1 <= s.length <= 105
+s consists of only uppercase English letters.
+0 <= k <= s.length
+
+CODE:
+
+BRUTE Force Approach:
+    - We use a brute-force method to solve this.
+    - For every possible starting index 'i', we try to extend the substring to every index 'j' (i ≤ j < n).
+    - We use a hashmap (unordered_map) to keep track of the frequency of characters in the current substring.
+    - At each step, we track the maximum frequency character in the current substring.
+    - The number of replacements needed is: (length of current substring) - (frequency of most common character)
+    - If the replacements needed are less than or equal to k, we update the maximum length.
+    - Otherwise, we break from the inner loop since any further extension will only increase the number of required replacements.
+*/
+
+int characterReplacement(string s, int k) {
+    int n = s.length();           // Length of the input string
+    int maxLen = 0;               // Stores the maximum length of a valid substring
+
+    // Iterate over all starting positions of substrings
+    for(int i = 0; i < n; i++) {
+        unordered_map<char, int> mp;  // Frequency map for characters in the current substring
+        int maxFreq = 0;              // Maximum frequency of a single character in the current substring
+
+        // Extend the substring from i to j
+        for(int j = i; j < n; j++) {
+            mp[s[j]]++;                            // Update frequency of current character
+            maxFreq = max(maxFreq, mp[s[j]]);      // Update max frequency in the current window
+
+            int changes = (j - i + 1) - maxFreq;    // Number of characters to replace
+            if(changes <= k) {
+                maxLen = max(maxLen, j - i + 1);    // Valid substring, update result
+            } else {
+                break;  // More than k changes needed, stop this substring
+            }
+        }
+    }
+
+    return maxLen;
+}
+
+OPTIMAL APPROACH- USING SLIDING WINDOW
+
+    Approach:
+    - This is an optimized sliding window technique (better than brute-force).
+    - We use two pointers: `i` (left) and `j` (right) to form a window [i...j].
+    - We keep track of the frequency of characters in the current window using a hashmap.
+    - `maxfreq` holds the count of the most frequent character in the window.
+    - To make all characters in the window the same, we need to replace the remaining characters:
+        changes_needed = (window size) - maxfreq
+    - If changes_needed > k → we shrink the window from the left.
+    - Otherwise, update the maximum length seen so far.
+
+    Time Complexity: O(N), where N is the length of the string.
+    Space Complexity: O(26) = O(1), since only uppercase English letters are used.
+*/
+
+int characterReplacement(string s, int k) {
+    int n = s.length();
+    int i = 0, j = 0;                      // Window pointers
+    int maxlen = 0;                        // Result variable to store max window length
+    int maxfreq = 0;                       // Max frequency of a single character in the window
+    unordered_map<char, int> mp;          // Frequency map for characters in the current window
+
+    while (j < n) {
+        mp[s[j]]++;                        // Include s[j] in the window
+        maxfreq = max(maxfreq, mp[s[j]]); // Update max frequency character in the current window
+
+        int changes = (j - i + 1) - maxfreq; // Characters to be changed in the window
+
+        // If more than k changes are needed, shrink window from the left
+        if (changes > k) {
+            mp[s[i]]--;                   // Remove s[i] from the window
+            if (mp[s[i]] == 0)            // Clean up the map if frequency becomes 0
+                mp.erase(s[i]);
+            i++;                          // Move left pointer
+        }
+
+        // If changes are within limit, update max length
+        if (changes <= k) {
+            maxlen = max(maxlen, j - i + 1);
+        }
+
+        j++; // Move right pointer
+    }
+
+    return maxlen;
+}
