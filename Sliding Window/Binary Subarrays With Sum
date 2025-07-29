@@ -1,0 +1,89 @@
+QUESTION:
+
+Given a binary array nums and an integer goal, return the number of non-empty subarrays with a sum goal.
+A subarray is a contiguous part of the array.
+
+Example 1:
+Input: nums = [1,0,1,0,1], goal = 2
+Output: 4
+Explanation: The 4 subarrays are bolded and underlined below:
+[1,0,1,0,1]
+[1,0,1,0,1]
+[1,0,1,0,1]
+[1,0,1,0,1]
+
+Example 2:
+Input: nums = [0,0,0,0,0], goal = 0
+Output: 15
+ 
+Constraints:
+1 <= nums.length <= 3 * 104
+nums[i] is either 0 or 1.
+0 <= goal <= nums.length
+
+CODE:
+Brute Force:
+
+int numSubarraysWithSum(vector<int>& nums, int goal) {
+        int n = nums.size();
+        int max_count=0;
+        int count=0;
+        for(int i=0;i<n;i++){
+            int sum=0;
+            for(int j=i;j<n;j++){
+                sum+=nums[j];
+                if(sum==goal){
+                    count++;
+                    max_count = max(max_count,count);
+                }
+            }
+        }
+        return max_count;
+}
+
+optimal approach-using sliding window
+
+class Solution {
+public:
+
+    // Helper function to count subarrays with sum <= goal
+    // This uses the sliding window technique, which works because the array contains only 0s and 1s.
+    int subarrayWithSumHelper(vector<int>& nums, int goal) {
+        int n = nums.size();
+        
+        // If the goal is negative, it's not possible to have any subarray with that sum
+        if (goal < 0)
+            return 0;
+
+        int i = 0, j = 0;     // Window start (i) and end (j)
+        int count = 0;        // To store the number of valid subarrays
+        int sum = 0;          // Current sum of the sliding window
+
+        while (j < n) {
+            sum += nums[j];   // Expand the window by adding the current element
+
+            // Shrink the window until the sum becomes less than or equal to the goal
+            while (sum > goal) {
+                sum -= nums[i];
+                i++;
+            }
+
+            // At this point, all subarrays ending at index 'j' and starting from 'i' to 'j' are valid
+            // So we add (j - i + 1) subarrays to our count
+            count += (j - i + 1);
+
+            j++;  // Move the window forward
+        }
+
+        return count;
+    }
+
+    // Main function to count the number of subarrays with sum exactly equal to 'goal'
+    int numSubarraysWithSum(vector<int>& nums, int goal) {
+        // The number of subarrays with exact sum == goal is:
+        // Count of subarrays with sum <= goal - Count of subarrays with sum <= goal - 1
+        // This works only for non-negative elements (like in binary arrays)
+        int result = subarrayWithSumHelper(nums, goal) - subarrayWithSumHelper(nums, goal - 1);
+        return result;
+    }
+};
